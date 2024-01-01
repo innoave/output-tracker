@@ -1,0 +1,13 @@
+# Rust
+target/
+Cargo.lock
+
+# VS Code
+.vscode/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Sublime Text
+*.sublime-workspace

@@ -1,0 +1,15 @@
+[package]
+name = "output-tracker"
+version = "0.1.0"
+edition = "2021"
+authors = ["haraldmaida"]
+license = "MIT/Apache-2.0"
+
+description = """Track actions done by an outband adapter in software following architecture
+ patterns like Ports & Adapters, Hexagonal Architecture or A-Frame Architecture"""
+keywords = ["tracking", "adapters", "a-frame", "hexagonal", "architecture"]
+
+[dependencies]
+
+[dev-dependencies]
+assertor = "0.0.2"
