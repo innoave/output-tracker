@@ -9,7 +9,22 @@ description = """Track actions done by an outband adapter in software following 
  patterns like Ports & Adapters, Hexagonal Architecture or A-Frame Architecture"""
 keywords = ["tracking", "adapters", "a-frame", "hexagonal", "architecture"]
 
+[package.metadata.docs.rs]
+all-features = true
+
+[features]
+default = []
+non-threadsafe = []
+threadsafe = []
+asynchronous = []
+
 [dependencies]
+thiserror = "1"
 
 [dev-dependencies]
 assertor = "0.0.2"
+
+[[example]]
+name = "basic"
+path = "examples/basic/main.rs"
+required-features = ["non-threadsafe"]

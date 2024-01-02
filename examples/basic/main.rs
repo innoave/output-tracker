@@ -1,5 +1,5 @@
 use assertor::*;
-use output_tracker::{OutputListener, OutputTracker};
+use output_tracker::non_threadsafe::{Error, OutputListener, OutputTracker};
 
 struct Adapter {
     output_listener: OutputListener<Message>,
@@ -12,7 +12,7 @@ impl Adapter {
         }
     }
 
-    fn track_messages(&self) -> OutputTracker<Message> {
+    fn track_messages(&self) -> Result<OutputTracker<Message>, Error> {
         self.output_listener.create_tracker()
     }
 
@@ -20,7 +20,9 @@ impl Adapter {
         // do some I/O
         println!("sending message: '{} - {}'", message.topic, message.content);
 
-        self.output_listener.emit(message);
+        // track that message was sent
+        // we ignore errors from the tracker here as it is not important for the business logic.
+        let _ = self.output_listener.emit(message);
     }
 }
 
@@ -33,7 +35,7 @@ struct Message {
 fn main() {
     let adapter = Adapter::new();
 
-    let tracker = adapter.track_messages();
+    let tracker = adapter.track_messages().unwrap();
 
     adapter.send_message(Message {
         topic: "weather report".to_string(),
@@ -45,7 +47,7 @@ fn main() {
         content: "keep your face to the sunshine and you cannot see a shadow".to_string(),
     });
 
-    let tracker_output = tracker.output();
+    let tracker_output = tracker.output().unwrap();
 
     println!("\nTracked messages:");
     for message in &tracker_output {
