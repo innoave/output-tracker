@@ -47,7 +47,7 @@ impl<M> OutputTracker<M> {
     }
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct OutputListener<M> {
     inner: ThreadsafeListener<M>,
 }
