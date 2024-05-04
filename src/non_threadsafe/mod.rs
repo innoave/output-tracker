@@ -1,4 +1,4 @@
-use crate::inner_listener::{BasicListener, CelledListener};
+use crate::inner_subject::{BasicSubject, CelledSubject};
 use crate::inner_tracker::{BasicTracker, CelledTracker};
 use crate::non_threadsafe::Error::{BorrowMutTrackerFailed, BorrowTrackerFailed};
 use crate::tracker_handle::TrackerHandle;
@@ -11,34 +11,34 @@ pub enum Error {
     BorrowTrackerFailed(BorrowError),
     #[error("failed to obtain mutable borrow of tracker, reason: {0}")]
     BorrowMutTrackerFailed(BorrowMutError),
-    #[error("failed to obtain immutable borrow of listener, reason: {0}")]
-    BorrowListenerFailed(BorrowError),
-    #[error("failed to obtain mutable borrow of listener, reason: {0}")]
-    BorrowMutListenerFailed(BorrowMutError),
+    #[error("failed to obtain immutable borrow of subject, reason: {0}")]
+    BorrowSubjectFailed(BorrowError),
+    #[error("failed to obtain mutable borrow of subject, reason: {0}")]
+    BorrowMutSubjectFailed(BorrowMutError),
 }
 
 #[derive(Debug)]
 pub struct OutputTracker<M> {
     handle: TrackerHandle,
     inner: NonThreadsafeTracker<M>,
-    listener: NonThreadsafeListener<M>,
+    subject: NonThreadsafeSubject<M>,
 }
 
 impl<M> OutputTracker<M> {
     fn new(
         handle: TrackerHandle,
         inner: NonThreadsafeTracker<M>,
-        listener: NonThreadsafeListener<M>,
+        subject: NonThreadsafeSubject<M>,
     ) -> Self {
         Self {
             handle,
             inner,
-            listener,
+            subject,
         }
     }
 
     pub fn stop(&self) -> Result<(), Error> {
-        self.listener.remove_tracker(self.handle)
+        self.subject.remove_tracker(self.handle)
     }
 
     pub fn clear(&self) -> Result<(), Error> {
@@ -54,19 +54,19 @@ impl<M> OutputTracker<M> {
 }
 
 #[derive(Default, Debug, Clone)]
-pub struct OutputListener<M> {
-    inner: NonThreadsafeListener<M>,
+pub struct OutputSubject<M> {
+    inner: NonThreadsafeSubject<M>,
 }
 
-impl<M> OutputListener<M> {
+impl<M> OutputSubject<M> {
     pub fn new() -> Self {
         Self {
-            inner: NonThreadsafeListener::new(),
+            inner: NonThreadsafeSubject::new(),
         }
     }
 }
 
-impl<M> OutputListener<M>
+impl<M> OutputSubject<M>
 where
     M: Clone,
 {
@@ -82,31 +82,31 @@ where
 }
 
 #[derive(Default, Debug, Clone)]
-struct NonThreadsafeListener<M> {
-    cell: Rc<RefCell<BasicListener<M, NonThreadsafeTracker<M>>>>,
+struct NonThreadsafeSubject<M> {
+    cell: Rc<RefCell<BasicSubject<M, NonThreadsafeTracker<M>>>>,
 }
 
-impl<M> NonThreadsafeListener<M> {
+impl<M> NonThreadsafeSubject<M> {
     fn new() -> Self {
         Self {
-            cell: Rc::new(RefCell::new(BasicListener::new())),
+            cell: Rc::new(RefCell::new(BasicSubject::new())),
         }
     }
 }
 
-impl<M> CelledListener<M, NonThreadsafeTracker<M>> for NonThreadsafeListener<M> {
-    type Inner<'a> = Ref<'a, BasicListener<M, NonThreadsafeTracker<M>>> where M: 'a;
-    type InnerMut<'a> = RefMut<'a, BasicListener<M, NonThreadsafeTracker<M>>> where M: 'a;
+impl<M> CelledSubject<M, NonThreadsafeTracker<M>> for NonThreadsafeSubject<M> {
+    type Inner<'a> = Ref<'a, BasicSubject<M, NonThreadsafeTracker<M>>> where M: 'a;
+    type InnerMut<'a> = RefMut<'a, BasicSubject<M, NonThreadsafeTracker<M>>> where M: 'a;
     type Error = Error;
 
-    fn listener(&self) -> Result<Self::Inner<'_>, Error> {
-        self.cell.try_borrow().map_err(Error::BorrowListenerFailed)
+    fn subject(&self) -> Result<Self::Inner<'_>, Error> {
+        self.cell.try_borrow().map_err(Error::BorrowSubjectFailed)
     }
 
-    fn listener_mut(&self) -> Result<Self::InnerMut<'_>, Error> {
+    fn subject_mut(&self) -> Result<Self::InnerMut<'_>, Error> {
         self.cell
             .try_borrow_mut()
-            .map_err(Error::BorrowMutListenerFailed)
+            .map_err(Error::BorrowMutSubjectFailed)
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::inner_listener::{BasicListener, CelledListener};
+use crate::inner_subject::{BasicSubject, CelledSubject};
 use crate::inner_tracker::{BasicTracker, CelledTracker};
 use crate::tracker_handle::TrackerHandle;
 use std::sync::{Arc, Mutex, MutexGuard, TryLockError};
@@ -7,32 +7,32 @@ use std::sync::{Arc, Mutex, MutexGuard, TryLockError};
 pub enum Error {
     #[error("failed to obtain lock for tracker")]
     LockTrackerFailed,
-    #[error("failed to obtain lock for listener")]
-    LockListenerFailed,
+    #[error("failed to obtain lock for subject")]
+    LockSubjectFailed,
 }
 
 #[derive(Debug)]
 pub struct OutputTracker<M> {
     handle: TrackerHandle,
     inner: ThreadsafeTracker<M>,
-    listener: ThreadsafeListener<M>,
+    subject: ThreadsafeSubject<M>,
 }
 
 impl<M> OutputTracker<M> {
     fn new(
         handle: TrackerHandle,
         inner: ThreadsafeTracker<M>,
-        listener: ThreadsafeListener<M>,
+        subject: ThreadsafeSubject<M>,
     ) -> Self {
         Self {
             handle,
             inner,
-            listener,
+            subject,
         }
     }
 
     pub fn stop(&self) -> Result<(), Error> {
-        self.listener.remove_tracker(self.handle)
+        self.subject.remove_tracker(self.handle)
     }
 
     pub fn clear(&self) -> Result<(), Error> {
@@ -48,19 +48,19 @@ impl<M> OutputTracker<M> {
 }
 
 #[derive(Default, Debug, Clone)]
-pub struct OutputListener<M> {
-    inner: ThreadsafeListener<M>,
+pub struct OutputSubject<M> {
+    inner: ThreadsafeSubject<M>,
 }
 
-impl<M> OutputListener<M> {
+impl<M> OutputSubject<M> {
     pub fn new() -> Self {
         Self {
-            inner: ThreadsafeListener::new(),
+            inner: ThreadsafeSubject::new(),
         }
     }
 }
 
-impl<M> OutputListener<M>
+impl<M> OutputSubject<M>
 where
     M: Clone,
 {
@@ -76,37 +76,37 @@ where
 }
 
 #[derive(Default, Debug, Clone)]
-struct ThreadsafeListener<M> {
-    cell: Arc<Mutex<BasicListener<M, ThreadsafeTracker<M>>>>,
+struct ThreadsafeSubject<M> {
+    cell: Arc<Mutex<BasicSubject<M, ThreadsafeTracker<M>>>>,
 }
 
-impl<M> ThreadsafeListener<M> {
+impl<M> ThreadsafeSubject<M> {
     fn new() -> Self {
         Self {
-            cell: Arc::new(Mutex::new(BasicListener::new())),
+            cell: Arc::new(Mutex::new(BasicSubject::new())),
         }
     }
 }
 
-impl<M> CelledListener<M, ThreadsafeTracker<M>> for ThreadsafeListener<M> {
-    type Inner<'a> = MutexGuard<'a, BasicListener<M, ThreadsafeTracker<M>>> where Self: 'a;
-    type InnerMut<'a> = MutexGuard<'a, BasicListener<M, ThreadsafeTracker<M>>> where Self: 'a;
+impl<M> CelledSubject<M, ThreadsafeTracker<M>> for ThreadsafeSubject<M> {
+    type Inner<'a> = MutexGuard<'a, BasicSubject<M, ThreadsafeTracker<M>>> where Self: 'a;
+    type InnerMut<'a> = MutexGuard<'a, BasicSubject<M, ThreadsafeTracker<M>>> where Self: 'a;
     type Error = Error;
 
-    fn listener(&self) -> Result<Self::Inner<'_>, Error> {
+    fn subject(&self) -> Result<Self::Inner<'_>, Error> {
         loop {
             match self.cell.try_lock() {
-                Ok(listener) => return Ok(listener),
+                Ok(subject) => return Ok(subject),
                 Err(TryLockError::WouldBlock) => {
                     // try again
                 },
-                Err(TryLockError::Poisoned(_)) => return Err(Error::LockListenerFailed),
+                Err(TryLockError::Poisoned(_)) => return Err(Error::LockSubjectFailed),
             }
         }
     }
 
-    fn listener_mut(&self) -> Result<Self::InnerMut<'_>, Error> {
-        self.listener()
+    fn subject_mut(&self) -> Result<Self::InnerMut<'_>, Error> {
+        self.subject()
     }
 }
 

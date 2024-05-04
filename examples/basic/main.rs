@@ -1,19 +1,20 @@
 use assertor::*;
-use output_tracker::non_threadsafe::{Error, OutputListener, OutputTracker};
+use output_tracker::non_threadsafe::{Error, OutputSubject, OutputTracker};
+use thiserror as _;
 
 struct Adapter {
-    output_listener: OutputListener<Message>,
+    output_subject: OutputSubject<Message>,
 }
 
 impl Adapter {
     fn new() -> Self {
         Self {
-            output_listener: OutputListener::new(),
+            output_subject: OutputSubject::new(),
         }
     }
 
     fn track_messages(&self) -> Result<OutputTracker<Message>, Error> {
-        self.output_listener.create_tracker()
+        self.output_subject.create_tracker()
     }
 
     fn send_message(&self, message: Message) {
@@ -22,7 +23,7 @@ impl Adapter {
 
         // track that message was sent
         // we ignore errors from the tracker here as it is not important for the business logic.
-        let _ = self.output_listener.emit(message);
+        let _ = self.output_subject.emit(message);
     }
 }
 

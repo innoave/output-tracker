@@ -4,30 +4,30 @@ use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 use std::slice;
 
-pub(crate) trait CelledListener<M, T> {
-    type Inner<'a>: Deref<Target = BasicListener<M, T>>
+pub(crate) trait CelledSubject<M, T> {
+    type Inner<'a>: Deref<Target = BasicSubject<M, T>>
     where
         Self: 'a;
-    type InnerMut<'a>: DerefMut<Target = BasicListener<M, T>>
+    type InnerMut<'a>: DerefMut<Target = BasicSubject<M, T>>
     where
         Self: 'a;
     type Error: std::error::Error;
 
-    fn listener(&self) -> Result<Self::Inner<'_>, Self::Error>;
+    fn subject(&self) -> Result<Self::Inner<'_>, Self::Error>;
 
-    fn listener_mut(&self) -> Result<Self::InnerMut<'_>, Self::Error>;
+    fn subject_mut(&self) -> Result<Self::InnerMut<'_>, Self::Error>;
 
     fn add_tracker(&self, tracker: T) -> Result<TrackerHandle, Self::Error>
     where
         T: CelledTracker<M>,
     {
-        self.listener_mut()
-            .map(|mut listener| listener.add_tracker(tracker))
+        self.subject_mut()
+            .map(|mut subject| subject.add_tracker(tracker))
     }
 
     fn remove_tracker(&self, tracker: TrackerHandle) -> Result<(), Self::Error> {
-        self.listener_mut()
-            .map(|mut listener| listener.remove_tracker(tracker))
+        self.subject_mut()
+            .map(|mut subject| subject.remove_tracker(tracker))
     }
 
     fn emit(&self, data: M) -> Result<(), Self::Error>
@@ -36,7 +36,7 @@ pub(crate) trait CelledListener<M, T> {
         T: CelledTracker<M>,
         Self::Error: From<<T as CelledTracker<M>>::Error>,
     {
-        for tracker in self.listener()?.trackers() {
+        for tracker in self.subject()?.trackers() {
             tracker.track(data.clone())?;
         }
         Ok(())
@@ -44,18 +44,18 @@ pub(crate) trait CelledListener<M, T> {
 }
 
 #[derive(Debug)]
-pub(crate) struct BasicListener<M, T> {
+pub(crate) struct BasicSubject<M, T> {
     _data: PhantomData<M>,
     trackers: Vec<(TrackerHandle, T)>,
 }
 
-impl<M, T> Default for BasicListener<M, T> {
+impl<M, T> Default for BasicSubject<M, T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<M, T> BasicListener<M, T> {
+impl<M, T> BasicSubject<M, T> {
     pub fn new() -> Self {
         Self {
             _data: PhantomData,

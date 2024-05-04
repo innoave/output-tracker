@@ -1,6 +1,6 @@
 #[cfg(feature = "asynchronous")]
 pub mod asynchronous;
-mod inner_listener;
+mod inner_subject;
 mod inner_tracker;
 #[cfg(feature = "non-threadsafe")]
 pub mod non_threadsafe;
