@@ -28,3 +28,39 @@ assertor = "0.0.2"
 name = "basic"
 path = "examples/basic/main.rs"
 required-features = ["non-threadsafe"]
+
+[lints.rust]
+unsafe_code = "forbid"
+unstable_features = "forbid"
+bare_trait_objects = "warn"
+deprecated = "warn"
+explicit_outlives_requirements = "warn"
+noop_method_call = "warn"
+rust_2018_idioms = "warn"
+rust_2021_incompatible_closure_captures = "warn"
+rust_2021_incompatible_or_patterns = "warn"
+rust_2021_prefixes_incompatible_syntax = "warn"
+rust_2021_prelude_collisions = "warn"
+single_use_lifetimes = "warn"
+trivial_casts = "warn"
+trivial_numeric_casts = "warn"
+unused_crate_dependencies = "warn"
+unused_extern_crates = "warn"
+unused_import_braces = "warn"
+unused_lifetimes = "warn"
+unused_qualifications = "warn"
+#variant_size_differences = "warn"  # enable when working on performance
+#missing_docs = "warn"  # uncomment when working on docs
+
+[lints.clippy]
+pedantic = "warn"
+nursery = "warn"
+derive_partial_eq_without_eq = "allow"
+enum_glob_use = "deny"
+expect_used = "deny"
+future_not_send = "allow"
+missing_const_for_fn = "deny"
+module_name_repetitions = "allow"
+unwrap_used = "deny"
+missing_errors_doc = "allow"  # remove when working on docs
+missing_panics_doc = "allow"  # remove when working on docs
