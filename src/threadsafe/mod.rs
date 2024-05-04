@@ -19,7 +19,7 @@ pub struct OutputTracker<M> {
 }
 
 impl<M> OutputTracker<M> {
-    fn new(
+    const fn new(
         handle: TrackerHandle,
         inner: ThreadsafeTracker<M>,
         subject: ThreadsafeSubject<M>,
@@ -53,6 +53,7 @@ pub struct OutputSubject<M> {
 }
 
 impl<M> OutputSubject<M> {
+    #[must_use]
     pub fn new() -> Self {
         Self {
             inner: ThreadsafeSubject::new(),

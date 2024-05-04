@@ -1,10 +1,10 @@
 use std::ops::{Deref, DerefMut};
 
-pub(crate) trait Tracker<M> {
+pub trait Tracker<M> {
     fn track(&mut self, data: M);
 }
 
-pub(crate) trait CelledTracker<M> {
+pub trait CelledTracker<M> {
     type Inner<'a>: Deref<Target = BasicTracker<M>>
     where
         Self: 'a;
@@ -36,12 +36,12 @@ pub(crate) trait CelledTracker<M> {
 }
 
 #[derive(Debug)]
-pub(crate) struct BasicTracker<M> {
+pub struct BasicTracker<M> {
     tracked: Vec<M>,
 }
 
 impl<M> BasicTracker<M> {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             tracked: Vec::new(),
         }

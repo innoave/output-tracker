@@ -4,7 +4,7 @@ use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 use std::slice;
 
-pub(crate) trait CelledSubject<M, T> {
+pub trait CelledSubject<M, T> {
     type Inner<'a>: Deref<Target = BasicSubject<M, T>>
     where
         Self: 'a;
@@ -44,7 +44,7 @@ pub(crate) trait CelledSubject<M, T> {
 }
 
 #[derive(Debug)]
-pub(crate) struct BasicSubject<M, T> {
+pub struct BasicSubject<M, T> {
     _data: PhantomData<M>,
     trackers: Vec<(TrackerHandle, T)>,
 }
@@ -56,7 +56,7 @@ impl<M, T> Default for BasicSubject<M, T> {
 }
 
 impl<M, T> BasicSubject<M, T> {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             _data: PhantomData,
             trackers: Vec::new(),
@@ -75,18 +75,18 @@ impl<M, T> BasicSubject<M, T> {
 
     pub fn remove_tracker(&mut self, tracker: TrackerHandle) {
         let found_index = self.trackers.iter().position(|&(it, _)| it == tracker);
-        found_index.iter().for_each(|&idx| {
+        for &idx in &found_index {
             let _ = self.trackers.remove(idx);
-        })
+        }
     }
 }
 
-pub(crate) struct Trackers<'a, T> {
+pub struct Trackers<'a, T> {
     inner: slice::Iter<'a, (TrackerHandle, T)>,
 }
 
 impl<'a, T> Trackers<'a, T> {
-    fn new(trackers: slice::Iter<'a, (TrackerHandle, T)>) -> Self {
+    const fn new(trackers: slice::Iter<'a, (TrackerHandle, T)>) -> Self {
         Self { inner: trackers }
     }
 }

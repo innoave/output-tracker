@@ -1,3 +1,4 @@
+#[allow(clippy::wildcard_imports)]
 use assertor::*;
 use output_tracker::non_threadsafe::{Error, OutputSubject, OutputTracker};
 use thiserror as _;
@@ -33,6 +34,7 @@ struct Message {
     content: String,
 }
 
+#[allow(clippy::unwrap_used)]
 fn main() {
     let adapter = Adapter::new();
 
@@ -64,5 +66,5 @@ fn main() {
             topic: "no shadow".to_string(),
             content: "keep your face to the sunshine and you cannot see a shadow".to_string(),
         },
-    ])
+    ]);
 }
