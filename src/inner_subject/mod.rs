@@ -75,7 +75,7 @@ impl<M, T> BasicSubject<M, T> {
 
     pub fn remove_tracker(&mut self, tracker: TrackerHandle) {
         let found_index = self.trackers.iter().position(|&(it, _)| it == tracker);
-        for &idx in &found_index {
+        if let Some(idx) = found_index {
             let _ = self.trackers.remove(idx);
         }
     }
