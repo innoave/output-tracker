@@ -4,7 +4,10 @@
 pub mod asynchronous;
 mod inner_subject;
 mod inner_tracker;
-#[cfg(feature = "non-threadsafe")]
+#[cfg(any(
+    feature = "non-threadsafe",
+    not(any(feature = "asynchronous", feature = "threadsafe"))
+))]
 pub mod non_threadsafe;
 #[cfg(feature = "threadsafe")]
 pub mod threadsafe;
