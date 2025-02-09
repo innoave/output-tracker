@@ -24,7 +24,7 @@ impl Adapter {
 
         // track that message was sent
         // we ignore errors from the tracker here as it is not important for the business logic.
-        let _ = self.output_subject.emit(message);
+        _ = self.output_subject.emit(message);
     }
 }
 

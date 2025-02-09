@@ -96,8 +96,14 @@ impl<M> NonThreadsafeSubject<M> {
 }
 
 impl<M> CelledSubject<M, NonThreadsafeTracker<M>> for NonThreadsafeSubject<M> {
-    type Inner<'a> = Ref<'a, BasicSubject<M, NonThreadsafeTracker<M>>> where M: 'a;
-    type InnerMut<'a> = RefMut<'a, BasicSubject<M, NonThreadsafeTracker<M>>> where M: 'a;
+    type Inner<'a>
+        = Ref<'a, BasicSubject<M, NonThreadsafeTracker<M>>>
+    where
+        M: 'a;
+    type InnerMut<'a>
+        = RefMut<'a, BasicSubject<M, NonThreadsafeTracker<M>>>
+    where
+        M: 'a;
     type Error = Error;
 
     fn subject(&self) -> Result<Self::Inner<'_>, Error> {
@@ -117,8 +123,14 @@ struct NonThreadsafeTracker<M> {
 }
 
 impl<M> CelledTracker<M> for NonThreadsafeTracker<M> {
-    type Inner<'a> = Ref<'a, BasicTracker<M>> where Self: 'a;
-    type InnerMut<'a> = RefMut<'a, BasicTracker<M>> where Self: 'a;
+    type Inner<'a>
+        = Ref<'a, BasicTracker<M>>
+    where
+        Self: 'a;
+    type InnerMut<'a>
+        = RefMut<'a, BasicTracker<M>>
+    where
+        Self: 'a;
     type Error = Error;
 
     fn new() -> Self {
