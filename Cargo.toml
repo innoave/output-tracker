@@ -25,6 +25,7 @@ thiserror = "2"
 
 [dev-dependencies]
 assertor = "0.0.3"
+version-sync = "0.9"
 
 [[example]]
 name = "basic"
