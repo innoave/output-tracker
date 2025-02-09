@@ -6,10 +6,9 @@ license = "MIT OR Apache-2.0"
 edition = "2021"
 
 description = """
-Track actions done by an outband adapter in software following architectural
-patterns like Ports & Adapters, Hexagonal Architecture or A-Frame Architecture
+Track and assert state of dependencies in state-based tests without mocks
 """
-keywords = ["tracking", "adapters", "a-frame", "hexagonal", "architecture"]
+keywords = ["tracking-state", "state-based-tests", "dependencies", "without-mocks", "nullables"]
 
 [package.metadata.docs.rs]
 all-features = true
