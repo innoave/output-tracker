@@ -9,6 +9,7 @@ description = """
 Track and assert state of dependencies in state-based tests without mocks
 """
 keywords = ["tracking-state", "state-based-tests", "dependencies", "without-mocks", "nullables"]
+categories = ["development-tools::testing", "development-tools::debugging"]
 
 [package.metadata.docs.rs]
 all-features = true
