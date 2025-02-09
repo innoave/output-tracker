@@ -21,10 +21,10 @@ threadsafe = []
 asynchronous = []
 
 [dependencies]
-thiserror = "1"
+thiserror = "2"
 
 [dev-dependencies]
-assertor = "0.0.2"
+assertor = "0.0.3"
 
 [[example]]
 name = "basic"
