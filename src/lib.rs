@@ -8,9 +8,9 @@ pub mod non_threadsafe;
 pub mod threadsafe;
 mod tracker_handle;
 
+// workaround for false positive 'unused extern crate' warnings until
+// Rust issue [#95513](https://github.com/rust-lang/rust/issues/95513) is fixed
 #[cfg(test)]
 mod tests {
-    // workaround to avoid false positive linter warnings `unused_extern_crates` until
-    // Rust issue [#57274](https://github.com/rust-lang/rust/issues/57274) is solved.
-    use assertor as _;
+    use thiserror as _;
 }
