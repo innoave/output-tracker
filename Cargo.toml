@@ -1,12 +1,14 @@
 [package]
 name = "output-tracker"
 version = "0.1.0"
-edition = "2021"
 authors = ["haraldmaida"]
 license = "MIT OR Apache-2.0"
+edition = "2021"
 
-description = """Track actions done by an outband adapter in software following architectural
- patterns like Ports & Adapters, Hexagonal Architecture or A-Frame Architecture"""
+description = """
+Track actions done by an outband adapter in software following architectural
+patterns like Ports & Adapters, Hexagonal Architecture or A-Frame Architecture
+"""
 keywords = ["tracking", "adapters", "a-frame", "hexagonal", "architecture"]
 
 [package.metadata.docs.rs]
