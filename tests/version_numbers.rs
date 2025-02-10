@@ -3,6 +3,7 @@
 mod dummy_extern_uses {
     use assertor as _;
     use output_tracker as _;
+    use proptest as _;
     use thiserror as _;
 }
 

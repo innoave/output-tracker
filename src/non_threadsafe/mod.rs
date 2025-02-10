@@ -147,3 +147,6 @@ impl<M> CelledTracker<M> for NonThreadsafeTracker<M> {
         self.cell.try_borrow_mut().map_err(BorrowMutTrackerFailed)
     }
 }
+
+#[cfg(test)]
+mod tests;
