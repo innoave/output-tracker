@@ -2,6 +2,7 @@ use super::*;
 use assertor::*;
 use proptest::collection::vec;
 use proptest::prelude::*;
+use std::sync::RwLock;
 use std::thread;
 use std::time::Duration;
 
@@ -270,6 +271,11 @@ proptest! {
         items in (0..=500_usize).prop_flat_map(|size| vec(any::<i64>(), size)),
     ) {
         let subject = OutputSubject::<i64>::new();
+
+        let items_emitted = Arc::new(RwLock::new(false));
+        let items_emitted_c0 = Arc::clone(&items_emitted);
+        let write_items_emitted = items_emitted_c0.write().unwrap_or_else(|err| panic!("could not get write access to items_emitted: {err}"));
+
         let tracker1 = subject
             .create_tracker()
             .unwrap_or_else(|err| panic!("could not create output tracker 1: {err}"));
@@ -280,20 +286,26 @@ proptest! {
             .create_tracker()
             .unwrap_or_else(|err| panic!("could not create output tracker 3: {err}"));
 
+        let items_emitted_c1 = Arc::clone(&items_emitted);
         let thread1 = thread::spawn(move || {
-            thread::sleep(Duration::from_millis(10));
+            let _ready = items_emitted_c1.read().unwrap_or_else(|err| panic!("failed to read items_emitted: {err}"));
+
             tracker1.output()
                 .unwrap_or_else(|err| panic!("failed to read tracker output: {err}"))
         });
 
+        let items_emitted_c2 = Arc::clone(&items_emitted);
         let thread2 = thread::spawn(move || {
-            thread::sleep(Duration::from_millis(10));
+            let _ready = items_emitted_c2.read().unwrap_or_else(|err| panic!("failed to read items_emitted: {err}"));
+
             tracker2.output()
                 .unwrap_or_else(|err| panic!("failed to read tracker output: {err}"))
         });
 
+        let items_emitted_c3 = Arc::clone(&items_emitted);
         let thread3 = thread::spawn(move || {
-            thread::sleep(Duration::from_millis(10));
+            let _ready = items_emitted_c3.read().unwrap_or_else(|err| panic!("failed to read items_emitted: {err}"));
+
             tracker3.output()
                 .unwrap_or_else(|err| panic!("failed to read tracker output: {err}"))
         });
@@ -302,6 +314,8 @@ proptest! {
             subject.emit(*item)
                 .unwrap_or_else(|err| panic!("could not emit item {item} on output subject: {err}"));
         }
+
+        drop(write_items_emitted);
 
         let output1 = thread1.join().unwrap_or_else(|err| panic!("thread 1 panicked: {err:?}"));
         let output2 = thread2.join().unwrap_or_else(|err| panic!("thread 2 panicked: {err:?}"));
@@ -318,42 +332,73 @@ proptest! {
     ) {
         let subject = OutputSubject::<i64>::new();
 
+        let items_emitted = Arc::new(RwLock::new(false));
+        let items_emitted_c0 = Arc::clone(&items_emitted);
+        let write_items_emitted = items_emitted_c0.write().unwrap_or_else(|err| panic!("could not get write access to items_emitted: {err}"));
+
+        let tracker1_ready = Arc::new(Mutex::new(false));
+        let tracker1_ready_c1 = Arc::clone(&tracker1_ready);
+        let items_emitted_c1 = Arc::clone(&items_emitted);
         let subject1 = subject.clone();
         let thread1 = thread::spawn(move || {
+            let write_tracker1_ready = tracker1_ready_c1.lock().unwrap_or_else(|err| panic!("could not get write access to tracker1_ready: {err}"));
             let tracker1 = subject1
                 .create_tracker()
                 .unwrap_or_else(|err| panic!("could not create output tracker 1: {err}"));
-            thread::sleep(Duration::from_millis(15));
+
+            drop(write_tracker1_ready);
+            let _ready = items_emitted_c1.read().unwrap_or_else(|err| panic!("failed to read items_emitted: {err}"));
+
             tracker1.output()
                 .unwrap_or_else(|err| panic!("failed to read tracker output: {err}"))
         });
 
+        let tracker2_ready = Arc::new(Mutex::new(false));
+        let tracker2_ready_c1 = Arc::clone(&tracker2_ready);
+        let items_emitted_c2 = Arc::clone(&items_emitted);
         let subject2 = subject.clone();
         let thread2 = thread::spawn(move || {
+            let write_tracker2_ready = tracker2_ready_c1.lock().unwrap_or_else(|err| panic!("could not get write access to tracker1_ready: {err}"));
             let tracker2 = subject2
                 .create_tracker()
                 .unwrap_or_else(|err| panic!("could not create output tracker 2: {err}"));
-            thread::sleep(Duration::from_millis(15));
+
+            drop(write_tracker2_ready);
+            let _ready = items_emitted_c2.read().unwrap_or_else(|err| panic!("failed to read items_emitted: {err}"));
+
             tracker2.output()
                 .unwrap_or_else(|err| panic!("failed to read tracker output: {err}"))
         });
 
+        let tracker3_ready = Arc::new(Mutex::new(false));
+        let tracker3_ready_c1 = Arc::clone(&tracker3_ready);
+        let items_emitted_c3 = Arc::clone(&items_emitted);
         let subject3 = subject.clone();
         let thread3 = thread::spawn(move || {
+            let write_tracker3_ready = tracker3_ready_c1.lock().unwrap_or_else(|err| panic!("could not get write access to tracker1_ready: {err}"));
             let tracker3 = subject3
                 .create_tracker()
                 .unwrap_or_else(|err| panic!("could not create output tracker 3: {err}"));
-            thread::sleep(Duration::from_millis(15));
+
+            drop(write_tracker3_ready);
+            let _ready = items_emitted_c3.read().unwrap_or_else(|err| panic!("failed to read items_emitted: {err}"));
+
             tracker3.output()
                 .unwrap_or_else(|err| panic!("failed to read tracker output: {err}"))
         });
 
-        thread::sleep(Duration::from_millis(8));
+        thread::sleep(Duration::from_millis(5));
+
+        let _ready = tracker1_ready.lock().unwrap_or_else(|err| panic!("failed to read tracker1_ready: {err}"));
+        let _ready = tracker2_ready.lock().unwrap_or_else(|err| panic!("failed to read tracker2_ready: {err}"));
+        let _ready = tracker3_ready.lock().unwrap_or_else(|err| panic!("failed to read tracker3_ready: {err}"));
 
         for item in &items {
             subject.emit(*item)
                 .unwrap_or_else(|err| panic!("could not emit item {item} on output subject: {err}"));
         }
+
+        drop(write_items_emitted);
 
         let output1 = thread1.join().unwrap_or_else(|err| panic!("thread 1 panicked: {err:?}"));
         let output2 = thread2.join().unwrap_or_else(|err| panic!("thread 2 panicked: {err:?}"));
