@@ -50,4 +50,4 @@ clean:
 
 # generate and open docs locally
 doc:
-    cargo doc --all-features --no-deps --open
+    cargo +nightly doc --all-features --no-deps --open
