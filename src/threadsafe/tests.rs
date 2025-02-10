@@ -2,9 +2,8 @@ use super::*;
 use assertor::*;
 use proptest::collection::vec;
 use proptest::prelude::*;
-use std::sync::RwLock;
+use std::sync::{mpsc, RwLock};
 use std::thread;
-use std::time::Duration;
 
 #[test]
 fn an_output_tracker_can_be_created_from_a_default_subject() {
@@ -336,62 +335,66 @@ proptest! {
         let items_emitted_c0 = Arc::clone(&items_emitted);
         let write_items_emitted = items_emitted_c0.write().unwrap_or_else(|err| panic!("could not get write access to items_emitted: {err}"));
 
-        let tracker1_ready = Arc::new(Mutex::new(false));
-        let tracker1_ready_c1 = Arc::clone(&tracker1_ready);
+        let (tracker_ready_tx, tracker_ready_rc) = mpsc::channel();
+
+        let tracker1_ready = tracker_ready_tx.clone();
         let items_emitted_c1 = Arc::clone(&items_emitted);
         let subject1 = subject.clone();
         let thread1 = thread::spawn(move || {
-            let write_tracker1_ready = tracker1_ready_c1.lock().unwrap_or_else(|err| panic!("could not get write access to tracker1_ready: {err}"));
             let tracker1 = subject1
                 .create_tracker()
                 .unwrap_or_else(|err| panic!("could not create output tracker 1: {err}"));
 
-            drop(write_tracker1_ready);
+            tracker1_ready.send(1).unwrap_or_else(|err| panic!("tracker1 failed to send ready: {err}"));
+            drop(tracker1_ready);
+
             let _ready = items_emitted_c1.read().unwrap_or_else(|err| panic!("failed to read items_emitted: {err}"));
 
             tracker1.output()
                 .unwrap_or_else(|err| panic!("failed to read tracker output: {err}"))
         });
 
-        let tracker2_ready = Arc::new(Mutex::new(false));
-        let tracker2_ready_c1 = Arc::clone(&tracker2_ready);
+        let tracker2_ready = tracker_ready_tx.clone();
         let items_emitted_c2 = Arc::clone(&items_emitted);
         let subject2 = subject.clone();
         let thread2 = thread::spawn(move || {
-            let write_tracker2_ready = tracker2_ready_c1.lock().unwrap_or_else(|err| panic!("could not get write access to tracker1_ready: {err}"));
             let tracker2 = subject2
                 .create_tracker()
                 .unwrap_or_else(|err| panic!("could not create output tracker 2: {err}"));
 
-            drop(write_tracker2_ready);
+            tracker2_ready.send(2).unwrap_or_else(|err| panic!("tracker2 failed to send ready: {err}"));
+            drop(tracker2_ready);
+
             let _ready = items_emitted_c2.read().unwrap_or_else(|err| panic!("failed to read items_emitted: {err}"));
 
             tracker2.output()
                 .unwrap_or_else(|err| panic!("failed to read tracker output: {err}"))
         });
 
-        let tracker3_ready = Arc::new(Mutex::new(false));
-        let tracker3_ready_c1 = Arc::clone(&tracker3_ready);
+        let tracker3_ready = tracker_ready_tx;
         let items_emitted_c3 = Arc::clone(&items_emitted);
         let subject3 = subject.clone();
         let thread3 = thread::spawn(move || {
-            let write_tracker3_ready = tracker3_ready_c1.lock().unwrap_or_else(|err| panic!("could not get write access to tracker1_ready: {err}"));
             let tracker3 = subject3
                 .create_tracker()
                 .unwrap_or_else(|err| panic!("could not create output tracker 3: {err}"));
 
-            drop(write_tracker3_ready);
+            tracker3_ready.send(3).unwrap_or_else(|err| panic!("tracker2 failed to send ready: {err}"));
+            drop(tracker3_ready);
+
             let _ready = items_emitted_c3.read().unwrap_or_else(|err| panic!("failed to read items_emitted: {err}"));
 
             tracker3.output()
                 .unwrap_or_else(|err| panic!("failed to read tracker output: {err}"))
         });
 
-        thread::sleep(Duration::from_millis(20));
-
-        let _ready = tracker1_ready.lock().unwrap_or_else(|err| panic!("failed to read tracker1_ready: {err}"));
-        let _ready = tracker2_ready.lock().unwrap_or_else(|err| panic!("failed to read tracker2_ready: {err}"));
-        let _ready = tracker3_ready.lock().unwrap_or_else(|err| panic!("failed to read tracker3_ready: {err}"));
+        let mut tracker_ready = 0;
+        while let Ok(tr_rdy) = tracker_ready_rc.recv() {
+            tracker_ready += tr_rdy;
+            if tracker_ready >= 6 {
+                break;
+            }
+        }
 
         for item in &items {
             subject.emit(*item)
