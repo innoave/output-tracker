@@ -19,7 +19,6 @@ all-features = true
 default = []
 non-threadsafe = []
 threadsafe = []
-asynchronous = []
 
 [dependencies]
 thiserror = "2"
