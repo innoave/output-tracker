@@ -90,8 +90,14 @@ impl<M> ThreadsafeSubject<M> {
 }
 
 impl<M> CelledSubject<M, ThreadsafeTracker<M>> for ThreadsafeSubject<M> {
-    type Inner<'a> = MutexGuard<'a, BasicSubject<M, ThreadsafeTracker<M>>> where Self: 'a;
-    type InnerMut<'a> = MutexGuard<'a, BasicSubject<M, ThreadsafeTracker<M>>> where Self: 'a;
+    type Inner<'a>
+        = MutexGuard<'a, BasicSubject<M, ThreadsafeTracker<M>>>
+    where
+        Self: 'a;
+    type InnerMut<'a>
+        = MutexGuard<'a, BasicSubject<M, ThreadsafeTracker<M>>>
+    where
+        Self: 'a;
     type Error = Error;
 
     fn subject(&self) -> Result<Self::Inner<'_>, Error> {
@@ -117,8 +123,14 @@ struct ThreadsafeTracker<M> {
 }
 
 impl<M> CelledTracker<M> for ThreadsafeTracker<M> {
-    type Inner<'a> = MutexGuard<'a, BasicTracker<M>> where M: 'a;
-    type InnerMut<'a> = MutexGuard<'a, BasicTracker<M>> where M: 'a;
+    type Inner<'a>
+        = MutexGuard<'a, BasicTracker<M>>
+    where
+        M: 'a;
+    type InnerMut<'a>
+        = MutexGuard<'a, BasicTracker<M>>
+    where
+        M: 'a;
     type Error = Error;
 
     fn new() -> Self {
@@ -145,3 +157,6 @@ impl<M> CelledTracker<M> for ThreadsafeTracker<M> {
         self.tracker()
     }
 }
+
+#[cfg(test)]
+mod tests;
