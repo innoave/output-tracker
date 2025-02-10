@@ -348,7 +348,7 @@ proptest! {
                 .unwrap_or_else(|err| panic!("failed to read tracker output: {err}"))
         });
 
-        thread::sleep(Duration::from_millis(5));
+        thread::sleep(Duration::from_millis(8));
 
         for item in &items {
             subject.emit(*item)
