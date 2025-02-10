@@ -281,19 +281,19 @@ proptest! {
             .unwrap_or_else(|err| panic!("could not create output tracker 3: {err}"));
 
         let thread1 = thread::spawn(move || {
-            thread::sleep(Duration::from_millis(5));
+            thread::sleep(Duration::from_millis(10));
             tracker1.output()
                 .unwrap_or_else(|err| panic!("failed to read tracker output: {err}"))
         });
 
         let thread2 = thread::spawn(move || {
-            thread::sleep(Duration::from_millis(5));
+            thread::sleep(Duration::from_millis(10));
             tracker2.output()
                 .unwrap_or_else(|err| panic!("failed to read tracker output: {err}"))
         });
 
         let thread3 = thread::spawn(move || {
-            thread::sleep(Duration::from_millis(5));
+            thread::sleep(Duration::from_millis(10));
             tracker3.output()
                 .unwrap_or_else(|err| panic!("failed to read tracker output: {err}"))
         });
@@ -323,7 +323,7 @@ proptest! {
             let tracker1 = subject1
                 .create_tracker()
                 .unwrap_or_else(|err| panic!("could not create output tracker 1: {err}"));
-            thread::sleep(Duration::from_millis(10));
+            thread::sleep(Duration::from_millis(15));
             tracker1.output()
                 .unwrap_or_else(|err| panic!("failed to read tracker output: {err}"))
         });
@@ -333,7 +333,7 @@ proptest! {
             let tracker2 = subject2
                 .create_tracker()
                 .unwrap_or_else(|err| panic!("could not create output tracker 2: {err}"));
-            thread::sleep(Duration::from_millis(10));
+            thread::sleep(Duration::from_millis(15));
             tracker2.output()
                 .unwrap_or_else(|err| panic!("failed to read tracker output: {err}"))
         });
@@ -343,7 +343,7 @@ proptest! {
             let tracker3 = subject3
                 .create_tracker()
                 .unwrap_or_else(|err| panic!("could not create output tracker 3: {err}"));
-            thread::sleep(Duration::from_millis(10));
+            thread::sleep(Duration::from_millis(15));
             tracker3.output()
                 .unwrap_or_else(|err| panic!("failed to read tracker output: {err}"))
         });
