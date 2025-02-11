@@ -1,9 +1,23 @@
+mod fixture;
+
 #[allow(clippy::wildcard_imports)]
 use assertor::*;
 use output_tracker::non_threadsafe::{Error, OutputSubject, OutputTracker};
 use thiserror as _;
 
+//
+// Production code
+//
+
+#[derive(Debug, Clone, PartialEq)]
+struct Message {
+    topic: String,
+    content: String,
+}
+
+/// Outbound adapter for sending messages.
 struct Adapter {
+    // equip outbound adapter with output subject
     output_subject: OutputSubject<Message>,
 }
 
@@ -14,13 +28,13 @@ impl Adapter {
         }
     }
 
+    /// Create an `OutputTracker` for tracking messages that are sent.
     fn track_messages(&self) -> Result<OutputTracker<Message>, Error> {
         self.output_subject.create_tracker()
     }
 
     fn send_message(&self, message: Message) {
-        // do some I/O
-        println!("sending message: '{} - {}'", message.topic, message.content);
+        // do some I/O for production
 
         // track that message was sent
         // we ignore errors from the tracker here as it is not important for the business logic.
@@ -28,17 +42,26 @@ impl Adapter {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
-struct Message {
-    topic: String,
-    content: String,
-}
+//
+// Tests
+//
 
-#[allow(clippy::unwrap_used)]
-fn main() {
+#[test]
+fn send_message_via_adapter() {
+    //
+    // Arrange
+    //
+
     let adapter = Adapter::new();
 
-    let tracker = adapter.track_messages().unwrap();
+    // activate the `OutputTracker`
+    let tracker = adapter
+        .track_messages()
+        .unwrap_or_else(|err| panic!("failed to create message tracker {err}"));
+
+    //
+    // Act
+    //
 
     adapter.send_message(Message {
         topic: "weather report".to_string(),
@@ -50,12 +73,13 @@ fn main() {
         content: "keep your face to the sunshine and you cannot see a shadow".to_string(),
     });
 
-    let tracker_output = tracker.output().unwrap();
+    //
+    // Assert
+    //
 
-    println!("\nTracked messages:");
-    for message in &tracker_output {
-        println!("|-> {}: {}", message.topic, message.content);
-    }
+    let tracker_output = tracker
+        .output()
+        .unwrap_or_else(|err| panic!("failed to get output from tracker: {err}"));
 
     assert_that!(tracker_output).contains_exactly_in_order(vec![
         Message {
@@ -67,11 +91,4 @@ fn main() {
             content: "keep your face to the sunshine and you cannot see a shadow".to_string(),
         },
     ]);
-}
-
-// workaround for false positive 'unused extern crate' warnings until
-// Rust issue [#95513](https://github.com/rust-lang/rust/issues/95513) is fixed
-mod dummy_extern_uses {
-    use proptest as _;
-    use version_sync as _;
 }

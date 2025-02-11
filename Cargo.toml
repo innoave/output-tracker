@@ -28,11 +28,6 @@ assertor = "0.0.3"
 proptest = "1"
 version-sync = "0.9"
 
-[[example]]
-name = "basic"
-path = "examples/basic/main.rs"
-required-features = ["non-threadsafe"]
-
 [lints.rust]
 unsafe_code = "forbid"
 unstable_features = "forbid"
