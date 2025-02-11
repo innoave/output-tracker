@@ -99,11 +99,6 @@ fn main() {
 
     let tracker_output = tracker.output().unwrap();
 
-    println!("\nTracked messages:");
-    for message in &tracker_output {
-        println!("|-> {}: {}", message.topic, message.content);
-    }
-
     assert_that!(tracker_output).contains_exactly_in_order(vec![
         Message {
             topic: "weather report".to_string(),
