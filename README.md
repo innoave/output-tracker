@@ -44,6 +44,12 @@ use output_tracker::non_threadsafe::{Error, OutputSubject, OutputTracker};
 // Production code
 //
 
+#[derive(Debug, Clone, PartialEq)]
+struct Message {
+    topic: String,
+    content: String,
+}
+
 struct Adapter {
     output_subject: OutputSubject<Message>,
 }
@@ -67,12 +73,6 @@ impl Adapter {
         // we ignore errors from the tracker here as it is not important for the business logic.
         _ = self.output_subject.emit(message);
     }
-}
-
-#[derive(Debug, Clone, PartialEq)]
-struct Message {
-    topic: String,
-    content: String,
 }
 
 //
