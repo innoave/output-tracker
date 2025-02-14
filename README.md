@@ -112,6 +112,30 @@ fn main() {
 }
 ```
 
+There are integration tests that demonstrate the usage of this crate more extensively:
+
+| Example                                                                        | Description                                                                                                              |
+|:-------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------|
+| [`tests/basic_example.rs`](tests/basic_example.rs)                             | A basic example on how to use the output-tracker in an adapter like dependency to be tested.                             |
+| [`tests/threadsafe_example.rs`](tests/threadsafe_example.rs)                   | Is the same as the basic example, but uses the threadsafe output-tracker instead of the non-threadsafe one.              |
+| [`tests/nullable_repository_example.rs`](tests/nullable_repository_example.rs) | A more advanced example showing how to use the nullable pattern and an output-tracker for testing a database repository. |
+
+## Threadsafe and non-threadsafe variants
+
+The output-tracker functionality is provided in a non-threadsafe variant and a threadsafe one. The
+different variants are gated behind crate features and can be activated as needed. The API of the
+two variants is interchangeable. That is the struct names and functions are identical for both
+variants. The module from which the structs are imported determines which variant is being used.
+
+By default, only the non-threadsafe variant is compiled. One can activate only one variant or both
+variants if needed. The crate features and the variants which are activated by each feature are
+listed in the table below.
+
+| Crate feature    | Variant        | Rust module import                      |
+|:-----------------|:---------------|:----------------------------------------|
+| `non-threadsafe` | non-threadsafe | `use output_tracker::non_threadsafe::*` |
+| `threadsafe`     | threadsafe     | `use output_tracker::threadsafe::*`     |
+
 <!-- Badges and related URLs -->
 
 [crates-badge]: https://img.shields.io/crates/v/output-tracker.svg
