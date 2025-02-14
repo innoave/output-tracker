@@ -54,7 +54,7 @@ fn send_message_via_adapter() {
 
     let adapter = Adapter::new();
 
-    // activate the `OutputTracker`
+    // activate the output tracker
     let tracker = adapter
         .track_messages()
         .unwrap_or_else(|err| panic!("failed to create message tracker {err}"));
@@ -77,6 +77,7 @@ fn send_message_via_adapter() {
     // Assert
     //
 
+    // read the output from the output tracker
     let tracker_output = tracker
         .output()
         .unwrap_or_else(|err| panic!("failed to get output from tracker: {err}"));
