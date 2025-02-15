@@ -6,7 +6,7 @@
 ![MSRV][msrv-badge]
 [![code coverage][code-coverage-badge]][code-coverage-url]
 
-Output-Tracker is a utility for writing state-based tests with [nullables] instead of mocks. It can
+Output-Tracker is a utility for writing state-based tests using [nullables] instead of mocks. It can
 track the state of dependencies which can then be asserted in the test.
 
 > Output-Tracker is created after the great article
@@ -112,7 +112,7 @@ fn main() {
 }
 ```
 
-There are integration tests that demonstrate the usage of this crate more extensively:
+There are integration tests that demonstrate the usage of this crate in a more involved way:
 
 | Example                                                                        | Description                                                                                                              |
 |:-------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------|
