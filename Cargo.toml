@@ -49,7 +49,7 @@ unused_import_braces = "warn"
 unused_lifetimes = "warn"
 unused_qualifications = "warn"
 missing_docs = "warn"
-#variant_size_differences = "warn"  # enable when working on performance
+variant_size_differences = "warn"
 
 [lints.clippy]
 pedantic = { level = "warn", priority = -1 }
