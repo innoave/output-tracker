@@ -1,3 +1,6 @@
+//! Check the version number of this crate specified in the crate root and the
+//! README.
+
 mod fixture;
 
 #[test]

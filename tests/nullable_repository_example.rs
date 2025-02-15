@@ -1,3 +1,9 @@
+//! An example demonstrating how to test a repository component using the
+//! `nullables` pattern and an output-tracker.
+//!
+//! This example is more involved and shows details on how to write tests
+//! without using mocks in more real world like example.
+
 mod fixture;
 
 //
@@ -27,6 +33,7 @@ mod todo_repository {
         pub subject: String,
     }
 
+    /// An example of a minimal repository holding to-do items.
     pub struct TodoRepository {
         db: Box<dyn DbAccess>,
         todo_subject: OutputSubject<TodoEntity>,

@@ -1,3 +1,12 @@
+//! Basic example on how to use [`OutputSubject`] and [`OutputTracker`] to
+//! track data in a component that can be read an asserted to verify if the
+//! component does what is expected.
+//!
+//! This example uses the non-threadsafe variant.
+//!
+//! This same example but with using the threadsafe variant is available as
+//! [`threadsafe_example`]
+
 mod fixture;
 
 #[allow(clippy::wildcard_imports)]
