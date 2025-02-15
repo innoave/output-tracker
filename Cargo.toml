@@ -12,6 +12,8 @@ Track and assert state of dependencies in state-based tests without mocks
 keywords = ["tracking-state", "state-based-tests", "dependencies", "without-mocks", "nullables"]
 categories = ["development-tools::testing", "development-tools::debugging"]
 
+repository = "https://github.com/innoave/output-tracker.git"
+
 [package.metadata.docs.rs]
 all-features = true
 
