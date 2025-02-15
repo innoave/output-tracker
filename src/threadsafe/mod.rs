@@ -1,16 +1,36 @@
+//! Threadsafe variant of [`OutputTracker`] and [`OutputSubject`].
+//!
+//! For an example on how to use it see the crate level documentation.
+
 use crate::inner_subject::{BasicSubject, CelledSubject};
 use crate::inner_tracker::{BasicTracker, CelledTracker};
 use crate::tracker_handle::TrackerHandle;
 use std::sync::{Arc, Mutex, MutexGuard, TryLockError};
 
+/// Error type for the threadsafe [`OutputTracker`] and [`OutputSubject`].
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
-    #[error("failed to obtain lock for tracker")]
+    /// Failed to obtain a lock for the tracker.
+    #[error("failed to obtain a lock for the tracker")]
     LockTrackerFailed,
-    #[error("failed to obtain lock for subject")]
+    /// Failed to obtain a lock for the subject.
+    #[error("failed to obtain a lock for the subject")]
     LockSubjectFailed,
 }
 
+/// A struct that collects state data or action data of any kind.
+///
+/// This is the threadsafe variant.
+///
+/// The tracked data can be read any time and as often as needed by calling the
+/// [`output()`][OutputTracker::output]. Each time the output is read, all data
+/// collected so far are returned. To track only new data emitted after the last
+/// read of the output, the [`clear()`][OutputTracker::clear] function should be
+/// called.
+///
+/// The tracker can be deactivated by calling the [`stop()`][OutputTracker::stop]
+/// function to stop it from collecting data. Once stopped the tracker can not
+/// be activated again.
 #[derive(Debug)]
 pub struct OutputTracker<M> {
     handle: TrackerHandle,
@@ -31,14 +51,30 @@ impl<M> OutputTracker<M> {
         }
     }
 
+    /// Stops this tracker.
+    ///
+    /// After stopping a tracker it no longer tracks emitted data. Once a
+    /// tracker is stopped it can not be activated again.
     pub fn stop(&self) -> Result<(), Error> {
         self.subject.remove_tracker(self.handle)
     }
 
+    /// Clears the data this tracker has been collected so far.
+    ///
+    /// After clearing a tracker it still tracks any data which is emitted after
+    /// this clear function has been called.
     pub fn clear(&self) -> Result<(), Error> {
         self.inner.clear()
     }
 
+    /// Returns the data collected by this tracker so far.
+    ///
+    /// Each time this function is called it returns all data collected since
+    /// the tracker has been created or since the last call to of the
+    /// [`clear()`][OutputTracker::clear] function. To track only data that are
+    /// emitted after the last time the output was read, the
+    /// [`clear()`][OutputTracker::clear] should be called after the output has
+    /// been read.
     pub fn output(&self) -> Result<Vec<M>, Error>
     where
         M: Clone,
@@ -47,12 +83,25 @@ impl<M> OutputTracker<M> {
     }
 }
 
+/// Holds created [`OutputTracker`]s and emits data to all known trackers.
+///
+/// This is the threadsafe variant.
+///
+/// New [`OutputTracker`]s can be created by calling the
+/// [`create_tracker()`][OutputSubject::create_tracker] function.
+///
+/// The [`emit(data)`][OutputSubject::emit] function emits data to all trackers,
+/// that have been created for this subject and are not stopped yet.
 #[derive(Default, Debug, Clone)]
 pub struct OutputSubject<M> {
     inner: ThreadsafeSubject<M>,
 }
 
 impl<M> OutputSubject<M> {
+    /// Constructs a new [`OutputSubject`].
+    ///
+    /// A new subject does nothing unless one or more trackers have been
+    /// created.
     #[must_use]
     pub fn new() -> Self {
         Self {
@@ -65,12 +114,17 @@ impl<M> OutputSubject<M>
 where
     M: Clone,
 {
+    /// Creates a new [`OutputTracker`] and registers it to be ready to track
+    /// emitted data.
     pub fn create_tracker(&self) -> Result<OutputTracker<M>, Error> {
         let new_tracker = ThreadsafeTracker::new();
         let handle = self.inner.add_tracker(new_tracker.clone())?;
         Ok(OutputTracker::new(handle, new_tracker, self.inner.clone()))
     }
 
+    /// Emits given data to all active [`OutputTracker`]s.
+    ///
+    /// Stopped [`OutputTracker`]s do not receive any emitted data.
     pub fn emit(&self, data: M) -> Result<(), Error> {
         self.inner.emit(data)
     }
