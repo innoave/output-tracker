@@ -22,7 +22,40 @@
 //! actually using the infrastructure. Therefore, testing with nullables is
 //! easy to set up and the tests are running fast like unit tests.
 //!
-//! ## Usage
+//! ## How does it work?
+//!
+//! We have two main structs, the
+//! [`OutputTracker`][non_threadsafe::OutputTracker] and the
+//! [`OutputSubject`][non_threadsafe::OutputSubject].
+//!
+//! An [`OutputTracker`][non_threadsafe::OutputTracker] can track any state of
+//! some component or any actions executed by the component.
+//! [`OutputTracker`][non_threadsafe::OutputTracker]s can only be created by
+//! calling the function [`create_tracker()`][non_threadsafe::OutputSubject::create_tracker]
+//! of an [`OutputSubject`][non_threadsafe::OutputSubject].
+//!
+//! The [`OutputSubject`][non_threadsafe::OutputSubject] holds all
+//! [`OutputTracker`][non_threadsafe::OutputTracker] created through its
+//! [`create_tracker()`][non_threadsafe::OutputSubject::create_tracker]
+//! function. We can emit state or action data to all active
+//! [`OutputTracker`][non_threadsafe::OutputTracker]s by calling the function
+//! [`emit(data)`][non_threadsafe::OutputSubject::emit] on the
+//! [`OutputSubject`][non_threadsafe::OutputSubject].
+//!
+//! To read and assert the state or action data collected by an
+//! [`OutputTracker`][non_threadsafe::OutputTracker] we call the
+//! [`output()`][non_threadsafe::OutputTracker::output] function on the
+//! [`OutputTracker`][non_threadsafe::OutputTracker].
+//!
+//! That summarizes the basic usage of [`OutputSubject`][non_threadsafe::OutputSubject]
+//! and [`OutputTracker`][non_threadsafe::OutputTracker]. This API is provided
+//! in a threadsafe and a non-threadsafe variant. Both variants have the same
+//! API. The difference is in the implementation whether the struct can be sent
+//! and synced over different threads or not. For details on how to use the two
+//! variants see the chapter "Threadsafe and non-threadsafe variants" down
+//! below.
+//!
+//! ## Example
 //!
 //! Let's assume we have production code that uses an adapter called
 //! `MessageSender` to send messages to the outside world.
@@ -138,8 +171,9 @@
 //! }
 //! ```
 //!
-//! Now we need some way to assert that the code is actually doing the right things. This is where
-//! the output-tracker is used. To do so we equip the `MessageSender` with an `OutputSubject`.
+//! Now we need some way to assert that the code is actually doing the right
+//! things. This is where the output-tracker is used. To do so we equip the
+//! `MessageSender` with an `OutputSubject`.
 //!
 //! ```no_run
 //! # struct DomainMessage {
@@ -228,7 +262,8 @@
 //! }
 //! ```
 //!
-//! Now we can write a test to verify if a domain message is sent via the Mail-API.
+//! Now we can write a test to verify if a domain message is sent via the
+//! Mail-API.
 //!
 //! ```
 //! # struct DomainMessage {
@@ -365,19 +400,23 @@
 //! }
 //! ```
 //!
-//! See the integration tests of this crate as they demonstrate the usage of output-tracker in a
-//! more involved and complete way.
+//! See the integration tests of this crate as they demonstrate the usage of
+//! output-tracker in a more involved and complete way.
 //!
 //! ## Threadsafe and non-threadsafe variants
 //!
-//! The output-tracker functionality is provided in a non-threadsafe variant and a threadsafe one. The
-//! different variants are gated behind crate features and can be activated as needed. The API of the
-//! two variants is interchangeable. That is the struct names and functions are identical for both
-//! variants. The module from which the structs are imported determines which variant is being used.
+//! The output-tracker functionality is provided in a non-threadsafe variant and
+//! a threadsafe one. The different variants are gated behind crate features and
+//! can be activated as needed. The API of the two variants is interchangeable.
+//! That is the struct names and functions are identical for both variants. The
+//! module from which the structs are imported determines which variant is going
+//! to be used.
 //!
-//! By default, only the non-threadsafe variant is compiled. One can activate only one variant or both
-//! variants if needed. The crate features and the variants which are activated by each feature are
-//! listed in the table below.
+//! By default, only the non-threadsafe variant is compiled. One can activate
+//! only one variant or both variants as needed. If the feature `threadsafe` is
+//! specified, only the threadsafe variant is compiled. To use both variants at
+//! the same time both features must be specified. The crate features and the
+//! variants which are activated by each feature are listed in the table below.
 //!
 //! | Crate feature    | Variant        | Rust module import                                        |
 //! |:-----------------|:---------------|:----------------------------------------------------------|

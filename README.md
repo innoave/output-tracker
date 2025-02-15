@@ -125,7 +125,8 @@ There are integration tests that demonstrate the usage of this crate in a more i
 The output-tracker functionality is provided in a non-threadsafe variant and a threadsafe one. The
 different variants are gated behind crate features and can be activated as needed. The API of the
 two variants is interchangeable. That is the struct names and functions are identical for both
-variants. The module from which the structs are imported determines which variant is being used.
+variants. The module from which the structs are imported determines which variant is going to be
+used.
 
 By default, only the non-threadsafe variant is compiled. One can activate only one variant or both
 variants if needed. The crate features and the variants which are activated by each feature are
