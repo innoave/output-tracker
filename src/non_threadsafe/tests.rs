@@ -1,5 +1,5 @@
 use super::*;
-use assertor::*;
+use asserting::prelude::*;
 use proptest::collection::vec;
 use proptest::prelude::*;
 

@@ -9,8 +9,6 @@
 
 mod fixture;
 
-#[allow(clippy::wildcard_imports)]
-use assertor::*;
 use output_tracker::non_threadsafe::{Error, OutputSubject, OutputTracker};
 use thiserror as _;
 
@@ -55,6 +53,8 @@ impl Adapter {
 // Tests
 //
 
+use asserting::prelude::*;
+
 #[test]
 fn send_message_via_adapter() {
     //
@@ -91,7 +91,7 @@ fn send_message_via_adapter() {
         .output()
         .unwrap_or_else(|err| panic!("failed to get output from tracker: {err}"));
 
-    assert_that!(tracker_output).contains_exactly_in_order(vec![
+    assert_that!(tracker_output).contains_exactly([
         Message {
             topic: "weather report".to_string(),
             content: "it will be snowing tomorrow".to_string(),
