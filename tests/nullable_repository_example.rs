@@ -110,7 +110,7 @@ mod todo_repository {
 
 use crate::todo_domain::NewTodo;
 use crate::todo_repository::{TodoEntity, TodoRepository};
-use assertor::*;
+use asserting::prelude::*;
 
 #[test]
 fn insert_new_todo_item_into_repository() {
@@ -144,7 +144,7 @@ fn insert_new_todo_item_into_repository() {
         .output()
         .unwrap_or_else(|err| panic!("could not read output of todo tracker: {err}"));
 
-    assert_that!(inserted_todos).contains_exactly_in_order(vec![TodoEntity {
+    assert_that!(inserted_todos).contains_exactly([TodoEntity {
         subject: "remember the milk".into(),
     }]);
 }

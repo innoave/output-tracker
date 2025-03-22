@@ -78,7 +78,7 @@ impl Adapter {
 //
 // Test
 //
-use assertor::*;
+use asserting::prelude::*;
 
 // this is a test method in a test module
 // main() method is used here in the example so that it is compiled and run during doc-tests
@@ -99,7 +99,7 @@ fn main() {
 
     let tracker_output = tracker.output().unwrap();
 
-    assert_that!(tracker_output).contains_exactly_in_order(vec![
+    assert_that!(tracker_output).contains_exactly(vec![
         Message {
             topic: "weather report".to_string(),
             content: "it will be snowing tomorrow".to_string(),
