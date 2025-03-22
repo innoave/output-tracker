@@ -2,7 +2,6 @@
 
 [![crates.io][crates-badge]][crates-url]
 [![docs.rs][docs-badge]][docs-url]
-[![Apache-2.0 licensed][license-badge]][license-url]
 ![MSRV][msrv-badge]
 [![code coverage][code-coverage-badge]][code-coverage-url]
 
@@ -146,10 +145,6 @@ listed in the table below.
 [docs-badge]: https://docs.rs/output-tracker/badge.svg
 
 [docs-url]: https://docs.rs/output-tracker
-
-[license-badge]: https://img.shields.io/github/license/innoave/output-tracker?color=blue
-
-[license-url]: https://github.com/innoave/output-tracker/blob/main/LICENSE
 
 [msrv-badge]: https://img.shields.io/crates/msrv/output-tracker?color=chocolate
 
