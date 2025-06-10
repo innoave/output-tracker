@@ -10,7 +10,6 @@
 mod fixture;
 
 use output_tracker::non_threadsafe::{Error, OutputSubject, OutputTracker};
-use thiserror as _;
 
 //
 // Production code

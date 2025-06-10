@@ -4,10 +4,12 @@
 //!
 //! This example is basically the same as the [`basic_example`]. The only
 //! difference is that the basic example uses the non-threadsafe variant.
+#![allow(unused_crate_dependencies)]
+#![cfg(feature = "threadsafe")]
+
 mod fixture;
 
 use output_tracker::threadsafe::{Error, OutputSubject, OutputTracker};
-use thiserror as _;
 
 //
 // Production code
