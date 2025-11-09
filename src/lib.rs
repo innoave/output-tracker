@@ -425,7 +425,7 @@
 //!
 //! [nullables]: https://www.jamesshore.com/v2/projects/nullables
 
-#![doc(html_root_url = "https://docs.rs/output-tracker/0.1.0")]
+#![doc(html_root_url = "https://docs.rs/output-tracker/0.1.1")]
 
 mod inner_subject;
 mod inner_tracker;
