@@ -26,7 +26,7 @@ threadsafe = []
 thiserror = "2"
 
 [dev-dependencies]
-asserting = "0.16"
+asserting = "0.17"
 proptest = "1"
 version-sync = "0.9"
 
